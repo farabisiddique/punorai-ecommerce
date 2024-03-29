@@ -1,0 +1,27 @@
+ .mainSlider {
+   padding: 20px;
+ }
+
+ .sliderCtrlBtn {
+   background-color: black;
+   border-radius: 50%;
+   background-size: 50%;
+ }
+
+.category-title {
+  color: #33333E;
+  margin-bottom: 0.5rem;
+}
+
+.category-underline {
+  width: 110px;
+  height: 10px;
+  background-color: black;
+  border: none;
+
+}
+
+.horizontal-scroll {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}

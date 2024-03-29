@@ -1,89 +1,101 @@
 <?php
   session_start();
+
   $userId = isset($_SESSION['user_id'])? $_SESSION['user_id'] : 0;
-  include './db.php'; 
-  $database = new Database();
-  $conn = $database->connect();
 
-  function getCategoriesToShowOnHome($conn) {
-      $query = "SELECT category_id FROM category WHERE category_show_home = 1";
-      $stmt = $conn->prepare($query);
 
-      $stmt->execute();
-
-      $categoryIds = [];
-      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-          $categoryIds[] = $row['category_id'];
-      }
-
-      return $categoryIds;
-  }
-
-  $categoryIdsToShowOnHome = getCategoriesToShowOnHome($conn);
-  var_dump($categoryIdsToShowOnHome);
-  die();
-  
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PUNORAI</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUNORAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
-  <link href="./css/all.css" rel="stylesheet">
-  <link href="./css/home.css" rel="stylesheet">
-  <link href="./css/product.css" rel="stylesheet">
-  
+    <link href="./css/all.css" rel="stylesheet">
+    <link href="./css/product.css" rel="stylesheet">
 </head>
-
 <body>
+
   <div class="row">
     <div class="col-md-10 mx-auto">
-      
+
       <?php include './infobar.php'; ?>
       <?php include './navbar.php'; ?>
 
-      <div id="homePageCarousel" class="carousel slide mainSlider" data-bs-ride="carousel"
-        style="max-height: 600px; overflow: hidden;">
 
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img src="./img/sliders/s1.jpg" class="d-block w-100 sliderImg" alt="..."
-              style="max-height: 600px; object-fit: cover;">
+      <div class="container my-4">
+          <div class="row d-flex justify-content-center align-items-center">
+              <div class="col-lg-8">
+                  <h4 class="mb-4 text-dark">YOUR SHOPPING CART</h4>
+                  <div class="card mb-3">
+                      <div class="card-body">
+                          <div class="row align-items-center">
+                              <div class="col-md-2">
+                                  <img src="https://img.perniaspopupshop.com/catalog/product/s/a/SAMM122358_1.jpg" class="img-fluid" alt="Product">
+                              </div>
+                              <div class="col-md-4">
+                                  <h5 class="card-title">Product Name</h5>
+                                  <p class="card-text"><small class="text-muted">Product Description</small></p>
+                              </div>
+                              <div class="col-md-2 text-md-end">
+                                  <p class="card-text"><strong>$436.94</strong></p>
+                              </div>
+                              <div class="col-md-2">
+                                  <div class="input-group mb-3">
+                                      <button class="btn btn-outline-secondary" type="button" id="button-addon1"><i class="bi bi-dash"></i></button>
+                                      <input type="text" class="form-control text-center" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1" value="1">
+                                      <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i class="bi bi-plus"></i></button>
+                                  </div>
+                              </div>
+                              <div class="col-md-2 text-md-end">
+                                  <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Remove</button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Repeat for other items -->
+              </div>
+              <div class="col-lg-4">
+                  <div class="border border-dark p-3 mb-3">
+                      <h4 class="text-dark">CART SUMMARY</h4>
+                      <hr>
+                      <div class="mb-2 d-flex justify-content-between">
+                          <span class="text-dark">Cart Total</span>
+                          <strong class="text-dark">$722</strong>
+                      </div>
+                      <div class="mb-2 d-flex justify-content-between">
+                          <span class="text-dark">Total Discount</span>
+                          <strong class="text-dark">-$71</strong>
+                      </div>
+                      <div class="mb-4 d-flex justify-content-between">
+                          <span class="text-dark">Shipping</span>
+                          <strong class="text-dark">$0</strong>
+                      </div>
+                      <div class="mb-2 d-flex justify-content-between">
+                          <span class="fs-5 text-dark">TOTAL PAYABLE</span>
+                          <span class="fs-5 text-dark">$651</span>
+                      </div>
+                      <button class="btn btn-primary w-100 mb-2">PROCEED TO CHECKOUT</button>
+                      <button class="btn btn-outline-dark w-100">CONTINUE SHOPPING</button>
+                  </div>
+              </div>
           </div>
-          <div class="carousel-item">
-            <img src="./img/sliders/s2.jpg" class="d-block w-100 sliderImg" alt="..."
-              style="max-height: 600px; object-fit: cover;">
-          </div>
-          <div class="carousel-item">
-            <img src="./img/sliders/s3.jpg" class="d-block w-100 sliderImg" alt="..."
-              style="max-height: 600px; object-fit: cover;">
-          </div>
-        </div>
-        <button class="carousel-control-prev justify-content-start" type="button" data-bs-target="#homePageCarousel"
-          data-bs-slide="prev">
-          <span class="carousel-control-prev-icon sliderCtrlBtn" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next justify-content-end" type="button" data-bs-target="#homePageCarousel"
-          data-bs-slide="next">
-          <span class="carousel-control-next-icon sliderCtrlBtn" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
       </div>
 
-      <div class="container-fluid my-5 categoryProducts">
+
+      <div class="container-fluid  categoryProducts">
         <div class="row">
           <div class="col-12 text-left">
-            <h2 class="category-title">Category 1</h2>
+            <h2 class="category-title text-dark">More Products You Can Add To Your Cart </h2>
             <hr class="category-underline" />
           </div>
         </div>
@@ -286,31 +298,12 @@
           <a href="#" class="btn btn-primary">View More Products</a>
         </div>
       </div>
-      
-      <div class="container my-5 sellerEngagement">
-        <div class="row align-items-center">
-          <!-- Image on the left side -->
-          <div class="col-md-6 mb-3">
-            <img src="./img/home/seller.jpg" class="img-fluid" alt="Sell Your Fashion">
-          </div>
 
-          <!-- Engaging text and button on the right side -->
-          <div class="col-md-6">
-            <h2 class="text-dark">Become a Seller</h2>
-            <p class="text-dark">Turn your passion for fashion into profit. Sell your gently used clothing and
-              accessories on
-              our platform and reach thousands of buyers.</p>
-            <a href="#" class="btn btn-primary">Start Selling</a>
-          </div>
-        </div>
-      </div>
 
       <?php include './footer.php'; ?>
 
     </div>
   </div>
-
-  
 
   <?php include './gototop.php'; ?>
 
@@ -319,8 +312,5 @@
     crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="./js/all.js"></script>
-
-
 </body>
-
 </html>
