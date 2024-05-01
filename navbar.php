@@ -1,6 +1,6 @@
 <?php
     try {
-        $query = "SELECT * FROM category";
+        $query = "SELECT * FROM category ORDER BY category_show_home DESC";
         $stmt = $conn->prepare($query);
 
         $stmt->execute();

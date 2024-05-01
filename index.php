@@ -5,23 +5,70 @@
   $database = new Database();
   $conn = $database->connect();
 
-  function getCategoriesToShowOnHome($conn) {
-      $query = "SELECT category_id FROM category WHERE category_show_home = 1";
-      $stmt = $conn->prepare($query);
+  
+  // function getProductsToShowOnHome($conn) {
+  //   $query = "SELECT * FROM product 
+  //             JOIN subcategory ON product_subcat_id=subcat_id 
+  //             JOIN category ON subcat_category_id=category_id
+  //             JOIN product_image ON product_main_img_id=pimg_id 
+  //             WHERE category_show_home = 1 AND
+  //             product_hidden=1
+  //             ORDER BY category_id ASC";
+  //   $stmt = $conn->prepare($query);
+  //   $stmt->execute();
 
-      $stmt->execute();
+  //   $productsByCategory = array();
+  //   while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+  //       $categoryName = $row['category_name'];
+  //       if (!array_key_exists($categoryName, $productsByCategory)) {
+  //           $productsByCategory[$categoryName] = array();
+  //       }
+  //       array_push($productsByCategory[$categoryName], $row);
+  //   }
 
-      $categoryIds = [];
-      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-          $categoryIds[] = $row['category_id'];
-      }
+  //   return $productsByCategory;
+  // }
 
-      return $categoryIds;
+  function getProductsToShowOnHome($conn) {
+    $query = "SELECT * FROM product 
+              JOIN subcategory ON product_subcat_id=subcat_id 
+              JOIN category ON subcat_category_id=category_id
+              JOIN product_image ON product_main_img_id=pimg_id 
+              WHERE category_show_home = 1 AND
+              product_hidden = 1
+              ORDER BY category_id ASC, product_id ASC"; // Ensure a consistent ordering
+    $stmt = $conn->prepare($query);
+    $stmt->execute();
+
+    $productsByCategory = array();
+    $categoryCounts = array(); // Keep track of the number of products added per category
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $categoryName = $row['category_name'];
+        
+        if (!isset($categoryCounts[$categoryName])) {
+            $categoryCounts[$categoryName] = 0;
+        }
+
+        // Only add the product if this category has less than 8 products
+        if ($categoryCounts[$categoryName] < 8) {
+            if (!array_key_exists($categoryName, $productsByCategory)) {
+                $productsByCategory[$categoryName] = array();
+            }
+            array_push($productsByCategory[$categoryName], $row);
+            $categoryCounts[$categoryName]++; // Increment the count for this category
+        }
+    }
+
+    return $productsByCategory;
   }
 
-  $categoryIdsToShowOnHome = getCategoriesToShowOnHome($conn);
-  var_dump($categoryIdsToShowOnHome);
-  die();
+
+  $productsByCategory = getProductsToShowOnHome($conn);
+  
+ 
+  
+  
   
 ?>
 <!DOCTYPE html>
@@ -80,212 +127,84 @@
         </button>
       </div>
 
-      <div class="container-fluid my-5 categoryProducts">
-        <div class="row">
-          <div class="col-12 text-left">
-            <h2 class="category-title">Category 1</h2>
-            <hr class="category-underline" />
-          </div>
-        </div>
+      <?php
 
-        <div id="category1Carousel" class="carousel slide">
-          <!-- Carousel inner container -->
-          <div class="carousel-inner">
-            <!-- First carousel item -->
-            <div class="carousel-item active">
-              <div class="container-fluid">
-                <div class="row">
-                  <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card product-card mb-3 w-100 position-relative">
-                      <img src="./img/products/p1.jpg" class="card-img-top" alt="Product 1">
-                      <div
-                        class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
-                        <h5 class="card-title">
-                          <a href="#" class="text-decoration-none text-light productName">Product Name</a>
-                        </h5>
-                        <!-- Pricing Information -->
-                        <p class="mb-2" style="font-size: 0.9rem;">&#2547;
-                          <span class='product-price'>1900</span>
-                        </p>
-                        <button class="btn btn-primary addToCartBtn">
-                          <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
-                        </button>
-                      </div>
 
-                    </div>
+          foreach ($productsByCategory as $categoryName => $products) {
+            echo '<div class="container-fluid my-5 categoryProducts">';
+            echo '<div class="row">';
+            echo '<div class="col-12 text-left">';
+            echo '<h2 class="category-title">' . htmlspecialchars($categoryName) . '</h2>';
+            echo '<hr class="category-underline" />';
+            echo '</div>';
+            echo '</div>';
 
-                  </div>
-                  <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card product-card mb-3 w-100 position-relative">
-                      <img src="./img/products/p1.jpg" class="card-img-top" alt="Product 1">
-                      <div
-                        class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
-                        <h5 class="card-title">
-                          <a href="#" class="text-decoration-none text-light productName">Product Name</a>
-                        </h5>
-                        <!-- Pricing Information -->
-                        <p class="mb-2" style="font-size: 0.9rem;">&#2547;
-                          <span class='product-price'>1900</span>
-                        </p>
-                        <button class="btn btn-primary addToCartBtn">
-                          <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
-                        </button>
-                      </div>
+            // Start of carousel for this category
+            echo '<div id="' . htmlspecialchars(strtolower(str_replace(' ', '', $categoryName))) . 'Carousel" class="carousel slide">';
+            echo '<div class="carousel-inner">';
 
-                    </div>
+            // Group products for carousel items
+            $groupedProducts = array_chunk($products, 4); // Group by 4 for each slide
+            $isActive = true;
+            foreach ($groupedProducts as $group) {
+                $activeClass = $isActive ? ' active' : '';
+                echo '<div class="carousel-item' . $activeClass . '">';
+                echo '<div class="container-fluid"><div class="row">';
+                
+                foreach ($group as $product) {
+                    // Dynamically generate product details
+                    $pid = htmlspecialchars($product['product_id']);
+                    $productName = htmlspecialchars($product['product_name']); // Example column name
+                    $productPrice = htmlspecialchars($product['product_selling_price']); // Example column name
+                    $productImage = htmlspecialchars($product['pimg_src']); // Example column name
+                    echo '<div class="col-6 col-md-4 col-lg-3">
+                        <div class="card product-card mb-3 w-100 position-relative">
+                          <img src="./img/products/' . $productImage . '" class="card-img-top" alt="' . $productName . '">
+                          <div class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
+                            <h5 class="card-title">
+                              <a href="./product.php?pid='.$pid.'" class="text-decoration-none text-light productName">' . $productName . '</a>
+                            </h5>
+                            <p class="mb-2" style="font-size: 0.9rem;">&#2547;
+                              <span class="product-price">' . $productPrice . '</span>
+                            </p>
+                            <button class="btn btn-primary addToCartBtn">
+                              <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
+                            </button>
+                          </div>
+                        </div>
+                      </div>';
+                }
 
-                  </div>
+                echo '</div></div>'; // Close row and container-fluid
+                echo '</div>'; // Close carousel-item
+                $isActive = false; // Only the first group is active
+            }
 
-                  <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card product-card mb-3 w-100 position-relative">
-                      <img src="./img/products/p1.jpg" class="card-img-top" alt="Product 1">
-                      <div
-                        class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
-                        <h5 class="card-title">
-                          <a href="#" class="text-decoration-none text-light productName">Product Name</a>
-                        </h5>
-                        <!-- Pricing Information -->
-                        <p class="mb-2" style="font-size: 0.9rem;">&#2547;
-                          <span class='product-price'>1900</span>
-                        </p>
-                        <button class="btn btn-primary addToCartBtn">
-                          <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
-                        </button>
-                      </div>
+            // Close carousel-inner
+            echo '</div>';
 
-                    </div>
+            // Carousel controls, ensure to modify data-bs-target to match the carousel ID
+            echo '<button class="carousel-control-prev" type="button" data-bs-target="#' . htmlspecialchars(strtolower(str_replace(' ', '', $categoryName))) . 'Carousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>';
+            echo '<button class="carousel-control-next" type="button" data-bs-target="#' . htmlspecialchars(strtolower(str_replace(' ', '', $categoryName))) . 'Carousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>';
 
-                  </div>
-                  <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card product-card mb-3 w-100 position-relative">
-                      <img src="./img/products/p1.jpg" class="card-img-top" alt="Product 1">
-                      <div
-                        class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
-                        <h5 class="card-title">
-                          <a href="#" class="text-decoration-none text-light productName">Product Name</a>
-                        </h5>
-                        <!-- Pricing Information -->
-                        <p class="mb-2" style="font-size: 0.9rem;">&#2547;
-                          <span class='product-price'>1900</span>
-                        </p>
-                        <button class="btn btn-primary addToCartBtn">
-                          <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
-                        </button>
-                      </div>
+            echo '</div>'; // Close carousel
+            // "View More Products" button
+            echo '<div class="text-center mt-4">';
+            echo '<a href="#" class="btn btn-primary">View More Products</a>';
+            echo '</div>';
+            echo '</div>'; // Close categoryProducts container
+          }
 
-                    </div>
 
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Second carousel item (repeat structure for additional items) -->
-            <div class="carousel-item">
-              <div class="container-fluid">
-                <div class="row">
-                  <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card product-card mb-3 w-100 position-relative">
-                      <img src="./img/products/p1.jpg" class="card-img-top" alt="Product 1">
-                      <div
-                        class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
-                        <h5 class="card-title">
-                          <a href="#" class="text-decoration-none text-light productName">Product Name</a>
-                        </h5>
-                        <!-- Pricing Information -->
-                        <p class="mb-2" style="font-size: 0.9rem;">&#2547;
-                          <span class='product-price'>1900</span>
-                        </p>
-                        <button class="btn btn-primary addToCartBtn">
-                          <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
-                        </button>
-                      </div>
 
-                    </div>
-
-                  </div>
-                  <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card product-card mb-3 w-100 position-relative">
-                      <img src="./img/products/p1.jpg" class="card-img-top" alt="Product 1">
-                      <div
-                        class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
-                        <h5 class="card-title">
-                          <a href="#" class="text-decoration-none text-light productName">Product Name</a>
-                        </h5>
-                        <!-- Pricing Information -->
-                        <p class="mb-2" style="font-size: 0.9rem;">&#2547;
-                          <span class='product-price'>1900</span>
-                        </p>
-                        <button class="btn btn-primary addToCartBtn">
-                          <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
-                        </button>
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card product-card mb-3 w-100 position-relative">
-                      <img src="./img/products/p1.jpg" class="card-img-top" alt="Product 1">
-                      <div
-                        class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
-                        <h5 class="card-title">
-                          <a href="#" class="text-decoration-none text-light productName">Product Name</a>
-                        </h5>
-                        <!-- Pricing Information -->
-                        <p class="mb-2" style="font-size: 0.9rem;">&#2547;
-                          <span class='product-price'>1900</span>
-                        </p>
-                        <button class="btn btn-primary addToCartBtn">
-                          <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
-                        </button>
-                      </div>
-
-                    </div>
-
-                  </div>
-                  <div class="col-6 col-md-4 col-lg-3">
-                    <div class="card product-card mb-3 w-100 position-relative">
-                      <img src="./img/products/p1.jpg" class="card-img-top" alt="Product 1">
-                      <div
-                        class="product-info position-absolute bottom-0 start-50 translate-middle-x w-100 text-center product-info-plate p-2 pt-0">
-                        <h5 class="card-title">
-                          <a href="#" class="text-decoration-none text-light productName">Product Name</a>
-                        </h5>
-                        <!-- Pricing Information -->
-                        <p class="mb-2" style="font-size: 0.9rem;">&#2547;
-                          <span class='product-price'>1900</span>
-                        </p>
-                        <button class="btn btn-primary addToCartBtn">
-                          <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
-                        </button>
-                      </div>
-
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- More carousel items as needed -->
-          </div>
-          <!-- Carousel controls -->
-          <button class="carousel-control-prev justify-content-start prodCarouselControl" type="button"
-            data-bs-target="#category1Carousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon sliderCtrlBtn" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next justify-content-end prodCarouselControl" type="button"
-            data-bs-target="#category1Carousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon sliderCtrlBtn" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
-        </div>
-        <!-- View More Products button -->
-        <div class="text-center mt-4">
-          <a href="#" class="btn btn-primary">View More Products</a>
-        </div>
-      </div>
+      ?>
+      
       
       <div class="container my-5 sellerEngagement">
         <div class="row align-items-center">

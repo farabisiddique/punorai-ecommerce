@@ -1,7 +1,7 @@
 <?php
   session_start();
-
   $userId = isset($_SESSION['user_id'])? $_SESSION['user_id'] : 0;
+  include './db.php';
 
 
 ?>

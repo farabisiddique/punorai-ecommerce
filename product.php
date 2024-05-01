@@ -1,7 +1,16 @@
 <?php
   session_start();
-
   $userId = isset($_SESSION['user_id'])? $_SESSION['user_id'] : 0;
+  include './db.php'; 
+  $pId = isset($_GET['pid']) ? $_GET['pid'] : 0;
+
+  // Check if $pId is a number and greater than zero
+  if (is_numeric($pId) && ctype_digit((string)$pId) && $pId > 0) {
+      
+  } else {
+      header("location: index.php");
+  }
+
 
 
 ?>
