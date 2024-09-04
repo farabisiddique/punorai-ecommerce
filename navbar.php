@@ -18,6 +18,25 @@
         die("Error executing query: " . $e->getMessage());
     }
 
+    if($userId>0){
+      $cartSql = "SELECT * FROM cart WHERE cart_user_id = :userId";
+      $cartStmt = $conn->prepare($cartSql);
+
+      // Bind the user ID parameter
+      $cartStmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+
+      // Execute the query
+      $cartStmt->execute();
+
+      // Fetch all results into an associative array
+      $cartEntries = $cartStmt->fetchAll(PDO::FETCH_ASSOC);
+
+      // Count the number of entries
+      $cartEntryNum = count($cartEntries);
+      
+
+    }
+
 
 ?>
 <div class="row sticky-top twoStickyNavs">
@@ -34,9 +53,11 @@
           <a class="btn text-dark upperNavMenu" href="./cart.php">
             <i class="bi bi-cart-plus"></i>
           </a>
-          <!-- <span class="position-absolute cartBadge translate-middle badge rounded-pill bg-danger">
-            53
-          </span> -->
+          <?php if($userId>0){ ?>
+            <span class="position-absolute cartBadge translate-middle badge rounded-pill bg-danger">
+              <?php echo $cartEntryNum;  ?>
+            </span>
+          <?php } ?>
         </div>
 
         <?php 
@@ -71,7 +92,7 @@
             <?php 
               foreach ($categories as $category) {
             ?>
-              <a class="nav-link text-light lowerNavMenu" href="./cat1.php"><?php echo $category['category_name']; ?></a>
+              <a class="nav-link text-light lowerNavMenu" href="./showCatProduct.php?catid=<?php echo $category['category_id']; ?>"><?php echo $category['category_name']; ?></a>
             <?php
               }
             ?>

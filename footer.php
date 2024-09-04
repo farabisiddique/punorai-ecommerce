@@ -5,7 +5,7 @@
       <div class="col-sm-12 col-md-4 col-lg-4">
         <div class="footer-logo">
           <a href="./index.php" class="text-decoration-none text-light" title="PUNORAI">
-             <img src="img/all/logo.png" class="mainLogo" alt="PUNORAI" > 
+             <img src="img/all/white.png" class="mainLogo" alt="PUNORAI" > 
           </a>
         </div>
         <h5 class="mt-3">Follow Us On Social Media</h5>

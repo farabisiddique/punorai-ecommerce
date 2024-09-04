@@ -1,33 +1,11 @@
 <?php
   session_start();
-  $userId = isset($_SESSION['user_id'])? $_SESSION['user_id'] : 0;
+  $userId = (int)isset($_SESSION['user_id'])? $_SESSION['user_id'] : 0;
   include './db.php'; 
   $database = new Database();
   $conn = $database->connect();
 
-  
-  // function getProductsToShowOnHome($conn) {
-  //   $query = "SELECT * FROM product 
-  //             JOIN subcategory ON product_subcat_id=subcat_id 
-  //             JOIN category ON subcat_category_id=category_id
-  //             JOIN product_image ON product_main_img_id=pimg_id 
-  //             WHERE category_show_home = 1 AND
-  //             product_hidden=1
-  //             ORDER BY category_id ASC";
-  //   $stmt = $conn->prepare($query);
-  //   $stmt->execute();
-
-  //   $productsByCategory = array();
-  //   while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-  //       $categoryName = $row['category_name'];
-  //       if (!array_key_exists($categoryName, $productsByCategory)) {
-  //           $productsByCategory[$categoryName] = array();
-  //       }
-  //       array_push($productsByCategory[$categoryName], $row);
-  //   }
-
-  //   return $productsByCategory;
-  // }
+  // die(var_dump($userId));
 
   function getProductsToShowOnHome($conn) {
     $query = "SELECT * FROM product 
@@ -63,13 +41,9 @@
     return $productsByCategory;
   }
 
-
   $productsByCategory = getProductsToShowOnHome($conn);
-  
- 
-  
-  
-  
+  // die(var_dump($productsByCategory['Evening Gowns'][0]['category_id']));
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -84,6 +58,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <link href="./css/all.css" rel="stylesheet">
   <link href="./css/home.css" rel="stylesheet">
@@ -157,6 +132,8 @@
                     $productName = htmlspecialchars($product['product_name']); // Example column name
                     $productPrice = htmlspecialchars($product['product_selling_price']); // Example column name
                     $productImage = htmlspecialchars($product['pimg_src']); // Example column name
+                    $productCatId = htmlspecialchars($product['category_id']); // Example column name
+                    
                     echo '<div class="col-6 col-md-4 col-lg-3">
                         <div class="card product-card mb-3 w-100 position-relative">
                           <img src="./img/products/' . $productImage . '" class="card-img-top" alt="' . $productName . '">
@@ -167,7 +144,7 @@
                             <p class="mb-2" style="font-size: 0.9rem;">&#2547;
                               <span class="product-price">' . $productPrice . '</span>
                             </p>
-                            <button class="btn btn-primary addToCartBtn">
+                            <button class="btn btn-primary addToCartBtn" data-id="'.$pid.'" data-uid="'.$userId.'">
                               <i class="bi bi-cart-plus"></i>&nbsp;Add to Cart
                             </button>
                           </div>
@@ -196,7 +173,7 @@
             echo '</div>'; // Close carousel
             // "View More Products" button
             echo '<div class="text-center mt-4">';
-            echo '<a href="#" class="btn btn-primary">View More Products</a>';
+            echo '<a href="./showCatProduct.php?catid='.$productCatId.'" class="btn btn-primary">View More Products</a>';
             echo '</div>';
             echo '</div>'; // Close categoryProducts container
           }
@@ -237,7 +214,9 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="./js/all.js"></script>
+  <script src="./js/addRemoveCart.js"></script>
 
 
 </body>

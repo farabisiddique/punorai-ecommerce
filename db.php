@@ -23,7 +23,7 @@ class Database {
 }
 
 // Usage
-include './env.php';
+include 'env.php';
 
 $database = new Database();
 $conn = $database->connect();
