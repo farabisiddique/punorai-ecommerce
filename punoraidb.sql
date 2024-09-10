@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 29, 2024 at 06:26 AM
+-- Generation Time: Sep 10, 2024 at 07:49 AM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 8.0.12
 
@@ -33,6 +33,16 @@ CREATE TABLE `cart` (
   `cart_user_id` int(11) DEFAULT NULL,
   `cart_added_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `cart_product_id`, `cart_user_id`, `cart_added_at`) VALUES
+(24, 12, 12, '2024-09-01 10:40:39'),
+(25, 11, 12, '2024-09-01 10:40:42'),
+(27, 6, 12, '2024-09-01 10:47:33'),
+(29, 16, 12, '2024-09-01 11:05:12');
 
 -- --------------------------------------------------------
 
@@ -287,7 +297,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `category`

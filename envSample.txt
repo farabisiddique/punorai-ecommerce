@@ -1,0 +1,18 @@
+<?php 
+
+define("HOSTNAME", 'localhost');
+define("DB_NAME", 'punoraidb');
+define("DB_USER", 'root');
+define("DB_PASS", '');
+
+
+
+
+
+
+
+
+
+
+
+?>
